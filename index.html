@@ -1,0 +1,513 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kata Hati</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: logo bulat d'slurp di pojok kiri atas, lalu satu kolom sempit dengan tiga tahap. Nama dulu, pilihan suasana hati, lalu kata-kata terbuka di kartu berjahit putus-putus seperti badge di logo. */
+/* Palet dari logo: kuning mentega, jingga mangga, hijau matcha, cokelat, merah tua. f = isi, i = warna teks di atas latar, o = teks di atas isi. */
+:root {
+  --bg: #ffe99a;
+  --bg2: #fff8dc;
+  --card: #fffdf3;
+  --fg: #3a2218;
+  --muted: #7a5a47;
+  --line: #ecd9a0;
+  --shadow: rgba(58, 34, 24, 0.2);
+
+  --f-default: #f5a623; --i-default: #9a5b00; --o-default: #2b170f;
+  --f-senang: #f5a623; --i-senang: #9a5b00; --o-senang: #2b170f;
+  --f-sedih: #7a4a30; --i-sedih: #6b3e26; --o-sedih: #ffffff;
+  --f-galau: #8bc34a; --i-galau: #3f6b1b; --o-galau: #2b170f;
+  --f-stress: #f26a2e; --i-stress: #b03f0c; --o-stress: #2b170f;
+  --f-marah: #9b1b1e; --i-marah: #9b1b1e; --o-marah: #ffffff;
+
+  color-scheme: light;
+  --font-display: "Baloo 2", "Segoe UI Rounded", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(60rem 30rem at 90% -8%, var(--bg2), transparent 70%),
+    radial-gradient(40rem 26rem at -10% 105%, var(--bg2), transparent 70%);
+  background-repeat: no-repeat;
+  overflow-x: hidden;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  padding-block: 20px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+.topbar { position: relative; z-index: 1; display: flex; align-items: center; margin-bottom: 20px; }
+.logo {
+  display: block;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 4px var(--card), 0 8px 18px var(--shadow);
+}
+
+/* Mutiara boba melayang di latar. */
+.pearls { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.pearl { position: absolute; border-radius: 50%; opacity: 0.6; animation: floaty 7s ease-in-out infinite; }
+.pearl::after { content: ""; position: absolute; top: 18%; left: 22%; width: 26%; height: 26%; border-radius: 50%; background: rgba(255, 255, 255, 0.6); }
+.pearl:nth-child(2n) { animation-duration: 9s; animation-delay: -3s; }
+.pearl:nth-child(3n) { animation-duration: 8s; animation-delay: -5s; }
+@keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
+
+.app {
+  --fill: var(--f-default);
+  --ink: var(--i-default);
+  --on: var(--o-default);
+  --accent-soft: color-mix(in srgb, var(--fill) 16%, var(--card));
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.app[data-mood="senang"] { --fill: var(--f-senang); --ink: var(--i-senang); --on: var(--o-senang); }
+.app[data-mood="sedih"] { --fill: var(--f-sedih); --ink: var(--i-sedih); --on: var(--o-sedih); }
+.app[data-mood="galau"] { --fill: var(--f-galau); --ink: var(--i-galau); --on: var(--o-galau); }
+.app[data-mood="stress"] { --fill: var(--f-stress); --ink: var(--i-stress); --on: var(--o-stress); }
+.app[data-mood="marah"] { --fill: var(--f-marah); --ink: var(--i-marah); --on: var(--o-marah); }
+
+.brand {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--on);
+  background: var(--fill);
+  border-radius: 999px;
+  padding: 2px 14px;
+  margin: 0 0 12px;
+  transition: background-color .25s;
+}
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 10vw, 54px);
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.nm {
+  background: linear-gradient(transparent 58%, color-mix(in srgb, var(--fill) 75%, transparent) 58%);
+  padding: 0 0.08em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.lead { color: var(--muted); margin: 10px 0 0; max-width: 46ch; }
+
+.field { display: flex; flex-direction: column; gap: 8px; margin: 0; }
+label, legend { font-size: 14px; font-weight: 700; padding: 0; }
+.row { display: flex; gap: 10px; }
+input[type="text"] {
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--fg);
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 16px;
+  flex: 1;
+  min-width: 0;
+}
+input[type="text"]::placeholder { color: var(--muted); opacity: 0.75; font-weight: 400; }
+input[type="text"]:focus-visible { outline: 3px solid color-mix(in srgb, var(--fill) 55%, transparent); outline-offset: 1px; border-color: var(--fill); }
+.err { color: var(--i-marah); font-size: 14px; font-weight: 600; margin: 0; }
+
+.who {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 15px;
+  color: var(--muted);
+  margin-top: -8px;
+}
+.who b { color: var(--fg); font-weight: 700; overflow-wrap: anywhere; }
+.link {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.link:focus-visible { outline: 3px solid color-mix(in srgb, var(--fill) 60%, transparent); outline-offset: 2px; border-radius: 4px; }
+
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.moods { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 10px; }
+.mood {
+  font: inherit;
+  color: var(--fg);
+  background: color-mix(in srgb, var(--m) 22%, var(--card));
+  border: 2px solid color-mix(in srgb, var(--m) 60%, transparent);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--m) 50%, transparent);
+  border-radius: 18px;
+  padding: 14px 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  min-width: 0;
+  transition: background-color .15s, transform .15s, box-shadow .15s;
+}
+.mood .face { font-size: 38px; line-height: 1; }
+.mood .name { font-family: var(--font-display); font-size: 17px; font-weight: 600; line-height: 1.1; }
+.mood:hover { transform: translateY(-3px); }
+.mood:active { transform: translateY(3px); box-shadow: 0 1px 0 color-mix(in srgb, var(--m) 50%, transparent); }
+.mood:focus-visible { outline: 3px solid color-mix(in srgb, var(--m) 60%, transparent); outline-offset: 2px; }
+.mood[aria-pressed="true"] { background: var(--m); border-color: var(--m); color: var(--mo); }
+.mood[data-key="senang"] { --m: var(--f-senang); --mo: var(--o-senang); }
+.mood[data-key="sedih"] { --m: var(--f-sedih); --mo: var(--o-sedih); }
+.mood[data-key="galau"] { --m: var(--f-galau); --mo: var(--o-galau); }
+.mood[data-key="stress"] { --m: var(--f-stress); --mo: var(--o-stress); }
+.mood[data-key="marah"] { --m: var(--f-marah); --mo: var(--o-marah); }
+
+/* Kartu hasil: tepi putus-putus seperti jahitan di badge logo. */
+.result {
+  position: relative;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--fill) 30%, var(--card)), var(--card) 85%);
+  border: 2.5px dashed var(--fill);
+  border-radius: 26px;
+  box-shadow: 0 6px 0 color-mix(in srgb, var(--fill) 45%, transparent), 0 18px 30px -14px var(--shadow);
+  padding: 26px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: background-color .25s, border-color .25s;
+}
+.result::before {
+  content: "\201C";
+  position: absolute;
+  top: 2px;
+  right: 18px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 110px;
+  line-height: 1;
+  color: var(--fill);
+  opacity: 0.4;
+  pointer-events: none;
+}
+.tag {
+  align-self: flex-start;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--on);
+  background: var(--fill);
+  border-radius: 999px;
+  padding: 3px 14px;
+}
+blockquote {
+  margin: 0;
+  min-height: 3em;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(22px, 5.8vw, 28px);
+  line-height: 1.35;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+.dots { display: inline-flex; gap: 8px; padding-top: 14px; }
+.dots i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--fill);
+  animation: pulse 1s ease-in-out infinite;
+}
+.dots i:nth-child(2) { animation-delay: .15s; }
+.dots i:nth-child(3) { animation-delay: .3s; }
+@keyframes pulse { 0%, 100% { opacity: .25; transform: scale(.8); } 50% { opacity: 1; transform: scale(1); } }
+.reveal { animation: clearup 1s ease both; }
+@keyframes clearup { from { opacity: 0; filter: blur(10px); transform: translateY(8px); } to { opacity: 1; filter: blur(0); transform: none; } }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.2;
+  border-radius: 14px;
+  padding: 10px 20px;
+  cursor: pointer;
+  border: 2px solid var(--fill);
+  white-space: nowrap;
+  transition: transform .15s;
+}
+.btn:active { transform: translateY(3px); }
+.btn.primary:active { box-shadow: 0 1px 0 color-mix(in srgb, var(--fill) 60%, #3a2218); }
+.btn:focus-visible { outline: 3px solid color-mix(in srgb, var(--fill) 60%, transparent); outline-offset: 2px; }
+.btn.primary { background: var(--fill); color: var(--on); box-shadow: 0 4px 0 color-mix(in srgb, var(--fill) 60%, #3a2218); }
+.btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--fill); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+.btn:disabled:active { transform: none; }
+.go { width: 100%; margin-top: 6px; font-size: 19px; padding: 12px 20px; }
+.foot { color: var(--muted); font-size: 13px; margin: 0; }
+
+.screen { display: flex; flex-direction: column; gap: 28px; }
+#s-nama, #s-hasil { min-height: 55vh; justify-content: center; }
+h1 label { font-size: inherit; font-weight: inherit; padding: 0; }
+#s-hasil blockquote { font-size: clamp(24px, 6.4vw, 32px); }
+h1:focus { outline: none; }
+.fade { animation: rise .4s ease both; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .fade, .reveal, .dots i, .pearl { animation: none; }
+  * { transition: none !important; }
+}
+</style>
+
+<div class="pearls" aria-hidden="true">
+  <span class="pearl" style="right:14px;top:18px;width:40px;height:40px;background:#f5a623"></span>
+  <span class="pearl" style="right:-14px;top:24%;width:58px;height:58px;background:#8bc34a"></span>
+  <span class="pearl" style="left:-18px;top:46%;width:66px;height:66px;background:#7a4a30"></span>
+  <span class="pearl" style="right:-22px;top:64%;width:72px;height:72px;background:#f26a2e"></span>
+  <span class="pearl" style="left:7%;bottom:12%;width:34px;height:34px;background:#f5a623"></span>
+  <span class="pearl" style="right:8%;bottom:7%;width:44px;height:44px;background:#8bc34a"></span>
+  <span class="pearl" style="left:42%;bottom:-18px;width:54px;height:54px;background:#9b1b1e"></span>
+</div>
+
+<header class="topbar">
+  <img class="logo" src="data:image/webp;base64,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" alt="d'slurp" width="72" height="72">
+</header>
+
+<main class="app" id="app" data-mood="none">
+
+  <!-- Halaman 1: hanya input nama -->
+  <section class="screen" id="s-nama">
+    <form class="field" id="formNama" novalidate>
+      <h1><label for="nama">Siapa namamu?</label></h1>
+      <div class="row">
+        <input type="text" id="nama" maxlength="30" autocomplete="off" placeholder="Tulis namamu">
+        <button type="submit" class="btn primary" id="buka">Lanjut</button>
+      </div>
+      <p class="err" id="err" role="alert" hidden>Tulis namamu dulu ya.</p>
+    </form>
+  </section>
+
+  <!-- Halaman 2: hanya pilihan suasana hati -->
+  <section class="screen" id="s-mood" hidden>
+    <h1 id="judulMood">Hari ini kamu lagi gimana?</h1>
+    <div class="moods" id="moods" role="group" aria-label="Suasana hatimu sekarang"></div>
+  </section>
+
+  <!-- Halaman 3: hanya kata-kata -->
+  <section class="screen" id="s-hasil" hidden>
+    <section class="result" id="result" aria-live="polite">
+      <blockquote id="quote"></blockquote>
+    </section>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  var MOODS = {
+    senang: { label: "Senang", face: "😊", quotes: [
+      "{nama}, senyummu hari ini lagi bagus-bagusnya. Simpan rasa ini, kamu pantas merasakannya.",
+      "Hari yang baik dimulai dari hati yang ringan. Nikmati, {nama}.",
+      "Kalau lagi bahagia, ceritakan ke satu orang. Bahagianya jadi dua kali lebih besar.",
+      "Rayakan hal kecil hari ini, {nama}. Hal kecil yang disyukuri lama-lama jadi besar.",
+      "Tawa itu gratis tapi nilainya mahal. Terus sebarkan, {nama}.",
+      "Ingat rasa ini baik-baik. Nanti di hari yang berat, kamu bisa kembali ke sini.",
+      "Kamu sudah berjalan sejauh ini, {nama}. Wajar kalau hari ini terasa menyenangkan.",
+      "Langit mungkin biasa saja, tapi di dalam dirimu lagi cerah. Itu cukup.",
+      "Bagikan kebahagiaanmu hari ini, {nama}. Satu pesan hangat bisa mengubah hari orang lain.",
+      "Senang itu tidak perlu alasan besar. Secangkir minuman dingin pun boleh jadi alasan."
+    ]},
+    sedih: { label: "Sedih", face: "😢", quotes: [
+      "Boleh menangis, {nama}. Air mata bukan tanda lemah, itu tanda kamu peduli.",
+      "Hari ini berat, dan itu tidak apa-apa. Kamu tidak harus kuat setiap saat.",
+      "Perasaan ini nyata, tapi tidak akan tinggal selamanya. Biarkan ia lewat pelan-pelan.",
+      "{nama}, kamu sudah melakukan yang terbaik dengan tenaga yang kamu punya.",
+      "Minum air, tarik napas panjang, istirahat sebentar. Hal kecil juga merawat.",
+      "Tidak semua luka harus cepat sembuh. Pelan-pelan juga sembuh, {nama}.",
+      "Kalau belum ingin bercerita, tidak apa-apa. Cukup ingat bahwa kamu tidak sendirian.",
+      "Malam yang gelap tetap berakhir. Pagi selalu datang, {nama}, termasuk untukmu.",
+      "Peluk dirimu sendiri hari ini. Kamu sedang butuh itu.",
+      "Sedihmu valid, {nama}. Tidak perlu membandingkannya dengan masalah orang lain."
+    ]},
+    galau: { label: "Galau", face: "😕", quotes: [
+      "Bingung itu tanda kamu sedang berpikir serius, {nama}. Tidak perlu terburu-buru memutuskan.",
+      "Kamu tidak harus punya jawaban malam ini. Tidur dulu, besok kepala lebih jernih.",
+      "Tulis semua yang berputar di kepalamu, {nama}. Pikiran yang tertulis lebih mudah diurai.",
+      "Tidak ada pilihan yang sempurna. Pilih yang paling bisa kamu pertanggungjawabkan.",
+      "Galau sering muncul saat kita peduli pada banyak hal. Itu bukan kekurangan.",
+      "Kalau ragu, kecilkan pertanyaannya. Apa satu langkah kecil yang bisa kamu ambil hari ini, {nama}?",
+      "Jangan putuskan hal besar saat pikiran lagi ramai. Beri waktu satu malam.",
+      "Hatimu mungkin belum sepakat dengan kepalamu, {nama}. Dengarkan keduanya pelan-pelan.",
+      "Tidak apa-apa belum tahu mau ke mana. Banyak orang berjalan sambil mencari arah.",
+      "Ceritakan ke orang yang kamu percaya. Kadang jawabannya muncul saat kita bicara."
+    ]},
+    stress: { label: "Stress", face: "😖", quotes: [
+      "Tarik napas empat hitungan, tahan, lalu buang pelan. Ulangi tiga kali, {nama}.",
+      "Tugas yang menumpuk dikerjakan satu per satu. Pilih yang paling kecil dulu.",
+      "Kamu bukan mesin, {nama}. Istirahat sepuluh menit bukan buang waktu.",
+      "Tidak semua hal harus selesai hari ini. Tulis daftar, lalu pilih tiga yang terpenting.",
+      "Turunkan bahumu, kendurkan rahangmu. Banyak stres menumpuk di sana tanpa kita sadari.",
+      "Jalan kaki sebentar atau minum air putih. Tubuh yang tenang membantu kepala ikut tenang.",
+      "Kamu sudah melewati hari-hari berat sebelumnya, {nama}. Yang ini juga akan terlewati.",
+      "Kamu boleh bilang tidak pada hal yang belum sanggup kamu ambil sekarang.",
+      "Matikan notifikasi sebentar. Dunia bisa menunggu lima belas menit.",
+      "Meminta bantuan itu tanda cerdas, bukan tanda gagal, {nama}."
+    ]},
+    marah: { label: "Marah", face: "😠", quotes: [
+      "Tarik napas dulu, {nama}. Jawaban yang diberikan saat tenang hampir selalu lebih baik.",
+      "Marahmu boleh ada. Yang perlu dijaga adalah apa yang kamu lakukan dengannya.",
+      "Sebelum membalas pesan itu, tunggu dua puluh menit. Kamu akan berterima kasih pada dirimu nanti.",
+      "Pindahkan energi marahmu ke gerakan, {nama}. Jalan cepat atau peregangan membantu.",
+      "Tanyakan pada diri sendiri: apa yang sebenarnya aku butuhkan sekarang?",
+      "Tidak semua yang membuatmu kesal pantas mendapat seluruh harimu, {nama}.",
+      "Tulis semua kekesalanmu di catatan, lalu jangan kirim ke siapa pun. Lega, tanpa penyesalan.",
+      "Marah sering menutupi rasa kecewa. Kalau mau, coba cari tahu apa yang kecewa di dalamnya.",
+      "Minum air dingin, cuci muka, atur napas. Tubuhmu perlu sinyal bahwa kamu aman, {nama}.",
+      "Kamu berhak punya batas. Sampaikan dengan tenang saat kepalamu sudah dingin."
+    ]}
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var app = $("app"), form = $("formNama"), nameEl = $("nama"), errEl = $("err");
+  var moodsEl = $("moods"), result = $("result"), quoteEl = $("quote"), judulMood = $("judulMood");
+  var screens = { nama: $("s-nama"), mood: $("s-mood"), hasil: $("s-hasil") };
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var state = { name: "", mood: null, tpl: "", last: {}, busy: false, timer: null };
+
+  function cleanName() {
+    var n = nameEl.value.replace(/\s+/g, " ").trim();
+    return n ? n.charAt(0).toUpperCase() + n.slice(1) : "";
+  }
+
+  function replay(el, cls) {
+    cls = cls || "fade";
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+  }
+
+  Object.keys(MOODS).forEach(function (key) {
+    var m = MOODS[key];
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "mood";
+    b.dataset.key = key;
+    b.setAttribute("aria-pressed", "false");
+    b.innerHTML = '<span class="face" aria-hidden="true">' + m.face + '</span><span class="name">' + m.label + "</span>";
+    b.addEventListener("click", function () { chooseMood(key); });
+    moodsEl.appendChild(b);
+  });
+
+  function pick(key) {
+    var q = MOODS[key].quotes, i;
+    do { i = Math.floor(Math.random() * q.length); } while (q.length > 1 && i === state.last[key]);
+    state.last[key] = i;
+    return q[i];
+  }
+
+  // Pindah halaman: hanya satu halaman yang tampil.
+  function show(name) {
+    Object.keys(screens).forEach(function (k) { screens[k].hidden = k !== name; });
+    replay(screens[name]);
+    try { window.scrollTo(0, 0); } catch (e) {}
+    var h = screens[name].querySelector("h1");
+    if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); }
+  }
+
+  // Judul halaman 2: nama diberi stabilo.
+  function nameHeading() {
+    judulMood.textContent = "";
+    judulMood.appendChild(document.createTextNode("Hai "));
+    var nm = document.createElement("span");
+    nm.className = "nm";
+    nm.textContent = state.name;
+    judulMood.appendChild(nm);
+    judulMood.appendChild(document.createTextNode(", hari ini kamu lagi gimana?"));
+  }
+
+  // Halaman 1 ke 2: nama dikirim.
+  function toMoods() {
+    var n = cleanName();
+    if (!n) { errEl.hidden = false; nameEl.focus(); return; }
+    errEl.hidden = true;
+    state.name = n;
+    nameHeading();
+    show("mood");
+  }
+
+  // Halaman 2 ke 3: begitu suasana hati dipilih, langsung pindah.
+  function chooseMood(key) {
+    if (state.busy) return;
+    state.busy = true;
+    state.mood = key;
+    state.tpl = pick(key);
+    app.dataset.mood = key;
+    Array.prototype.forEach.call(moodsEl.children, function (b) {
+      b.setAttribute("aria-pressed", b.dataset.key === key ? "true" : "false");
+    });
+    setTimeout(function () { show("hasil"); reveal(); }, reduced ? 0 : 300);
+  }
+
+  function burst() {
+    if (reduced || !result.animate) return;
+    var cols = ["#f5a623", "#8bc34a", "#f26a2e", "#7a4a30", "#fdd878", "#9b1b1e"];
+    for (var i = 0; i < 16; i++) {
+      var dot = document.createElement("span");
+      var size = 8 + Math.random() * 8;
+      dot.style.cssText = "position:absolute;left:50%;top:45%;width:" + size + "px;height:" + size + "px;border-radius:50%;pointer-events:none;background:" + cols[i % cols.length];
+      result.appendChild(dot);
+      var ang = Math.random() * Math.PI * 2, dist = 80 + Math.random() * 100;
+      var anim = dot.animate([
+        { transform: "translate(-50%,-50%) scale(.3)", opacity: 1 },
+        { transform: "translate(calc(-50% + " + (Math.cos(ang) * dist) + "px), calc(-50% + " + (Math.sin(ang) * dist) + "px)) scale(1)", opacity: 0 }
+      ], { duration: 800 + Math.random() * 300, easing: "cubic-bezier(.2,.8,.3,1)" });
+      anim.onfinish = (function (el) { return function () { el.remove(); }; })(dot);
+    }
+  }
+
+  // Halaman 3: tiga titik berdenyut sebentar, lalu kata-kata terbuka.
+  function reveal() {
+    quoteEl.className = "";
+    quoteEl.innerHTML = '<span class="dots" role="img" aria-label="Sedang dibuka"><i></i><i></i><i></i></span>';
+    replay(result);
+    clearTimeout(state.timer);
+    state.timer = setTimeout(function () {
+      quoteEl.textContent = state.tpl.split("{nama}").join(state.name);
+      replay(quoteEl, "reveal");
+      burst();
+    }, reduced ? 250 : 1600);
+  }
+
+  form.addEventListener("submit", function (e) { e.preventDefault(); toMoods(); });
+  nameEl.addEventListener("input", function () { if (cleanName()) errEl.hidden = true; });
+})();
+</script>
+
+</body></html>
